@@ -64,7 +64,7 @@ export UPDATE_ZSH_DAYS=7
 # go
 export GOPATH="$HOME/Code/go"
 export GOBIN="$GOPATH/bin"
-export GOCACHE="off"
+export GOCACHE=true
 export PATH="$GOBIN:$PATH"
 export PATH="/usr/local/bin:$PATH"
 
@@ -86,9 +86,10 @@ export TODOTXT_DEFAULT_ACTION=ls
 export TODOTXT_SORT_COMMAND='env LC_COLLATE=C sort -k 2,2 -k 1,1n'
 
 # FZF
-export FZF_DEFAULT_COMMAND='find .'
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_CTRL_T_COMMAND='fd --type f --type d --hidden --follow --exclude .git'
 export FZF_CTRL_T_OPTS="--preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -500' --preview-window right:100:wrap"
-export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:hidden:wrap --bind '?:toggle-preview'"
+export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:hidden:wrap --bind '?:toggle-preview' --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort' --header 'Press CTRL-Y to copy command into clipboard' --border"
 # =============
 
 # Aliases
@@ -100,7 +101,7 @@ alias t='todo.sh -cNt -d /Users/thomas/.config/todo/todo.cfg'
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git gitfast git-extras repo docker docker-compose tmux tmuxinator vi-mode web-search autojump colorize history golang redis-cli jsontools urltools osx brew gem  pip xcode pod zsh-autosuggestions fzf kubectl httpie taskwarrior)
+plugins=(git gitfast git-extras repo docker docker-compose tmux tmuxinator vi-mode web-search autojump colorize history golang redis-cli jsontools urltools osx brew gem  pip xcode pod zsh-autosuggestions fzf kubectl httpie)
 
 source $ZSH/oh-my-zsh.sh
 
