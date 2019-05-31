@@ -1,16 +1,59 @@
-execute pathogen#infect()
+call plug#begin('~/.vim/plugged')
+
+Plug 'vim-airline/vim-airline' | Plug 'vim-airline/vim-airline-themes'
+Plug 'edkolev/tmuxline.vim'
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'mhinz/vim-startify'
+Plug 'majutsushi/tagbar'
+Plug 'scrooloose/nerdtree'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+Plug 'vimwiki/vimwiki'
+
+Plug 'rizzatti/dash.vim'
+Plug 'w0rp/ale'
+Plug 'uber/prototool', { 'rtp':'vim/prototool' }
+
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+
+Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
+Plug 'AndrewRadev/splitjoin.vim'
+Plug 'justinmk/vim-sneak'
+Plug 'junegunn/vim-easy-align'
+Plug 'neoclide/coc.nvim', { 'do': { -> coc#util#install()} }
+
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-unimpaired'
+Plug 'tpope/vim-sensible'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-dadbod'
+Plug 'tpope/vim-abolish'
+
+Plug 'morhetz/gruvbox'
+Plug 'keith/swift.vim'
+Plug 'plasticboy/vim-markdown'
+Plug 'hashivim/vim-terraform'
+
+Plug 'leafgarland/typescript-vim'
+Plug 'sebdah/vim-delve'
+
+call plug#end()
 
 " """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Display
 " """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 syntax enable
-colorscheme gruvbox
 set background=dark
+let g:gruvbox_contrast_dark='hard'
+let g:gruvbox_invert_indent_guides='0'
+colorscheme gruvbox
+
 
 " """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Basic Settings
 " """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 let mapleader      = ' '
 let maplocalleader = ' '
 
@@ -52,31 +95,9 @@ set foldlevelstart=99
 set grepformat=%f:%l:%c:%m,%f:%l:%m
 set completeopt=menuone,preview
 set nocursorline
+set nopaste
 set nrformats=hex
 silent! set cryptmethod=blowfish2
-
-set formatoptions+=1
-if has('patch-7.3.541')
-  set formatoptions+=j
-endif
-if has('patch-7.4.338')
-  let &showbreak = '↳ '
-  set breakindent
-  set breakindentopt=sbr
-endif
-
-function! s:statusline_expr()
-  let mod = "%{&modified ? '[+] ' : !&modifiable ? '[x] ' : ''}"
-  let ro  = "%{&readonly ? '[RO] ' : ''}"
-  let ft  = "%{len(&filetype) ? '['.&filetype.'] ' : ''}"
-  let fug = "%{exists('g:loaded_fugitive') ? fugitive#statusline() : ''}"
-  let sep = ' %= '
-  let pos = ' %-12(%l : %c%V%) '
-  let pct = ' %P'
-
-  return '[%n] %F %<'.mod.ro.ft.fug.sep.pos.'%*'.pct
-endfunction
-let &statusline = s:statusline_expr()
 
 set modelines=2
 set synmaxcol=1000
@@ -88,26 +109,12 @@ try
 catch
 endtry
 
-" ctags
-set tags=./tags;/
-
 " Annoying temporary files
 set backupdir=/tmp//,.
 set directory=/tmp//,.
 if v:version >= 703
   set undodir=/tmp//,.
 endif
-
-" Shift-tab on GNU screen
-" http://superuser.com/questions/195794/gnu-screen-shift-tab-issue
-set t_kB=[Z
-
-" set complete=.,w,b,u,t
-set complete-=i
-
-" mouse
-silent! set ttymouse=xterm2
-set mouse=a
 
 " 80 chars/line
 set textwidth=0
@@ -136,20 +143,11 @@ nnoremap <leader>o o<esc>
 nnoremap <leader>O O<esc>
 
 " Save
-inoremap <C-s>     <C-O>:update<cr>
-nnoremap <C-s>     :update<cr>
 nnoremap <leader>s :update<cr>
-nnoremap <leader>w :update<cr>
 
 " Quit
-inoremap <C-Q>     <esc>:q<cr>
-nnoremap <C-Q>     :q<cr>
-vnoremap <C-Q>     <esc>
 nnoremap <Leader>q :q<cr>
 nnoremap <Leader>Q :qa!<cr>
-
-" Jump list (to newer position)
-nnoremap <C-p> <C-i>
 
 " <leader>n | NERD Tree
 nnoremap <leader>n :NERDTreeToggle<cr>
@@ -165,49 +163,15 @@ nnoremap Y y$
 " qq to record, Q to replay
 nnoremap Q @q
 
-" Zoom
-function! s:zoom()
-  if winnr('$') > 1
-    tab split
-  elseif len(filter(map(range(tabpagenr('$')), 'tabpagebuflist(v:val + 1)'),
-                  \ 'index(v:val, '.bufnr('').') >= 0')) > 1
-    tabclose
-  endif
-endfunction
-nnoremap <silent> <leader>z :call <sid>zoom()<cr>
-
-" Last inserted text
-nnoremap g. :normal! `[v`]<cr><left>
-
 " Disable highlight when <leader><cr> is pressed
 map <silent> <leader><cr> :noh<cr>
 
 " reload syntax highlighting
-noremap <F12> <Esc>:syntax sync fromstart<CR>
-inoremap <F12> <C-o>:syntax sync fromstart<CR>
+noremap <F10> <Esc>:syntax sync fromstart<CR>
+inoremap <F10> <C-o>:syntax sync fromstart<CR>
 
 " search and replace visual selection
 vnoremap <C-r> "hy:%s/<C-r>h//g<left><left>
-
-" ----------------------------------------------------------------------------
-" Quickfix
-" ----------------------------------------------------------------------------
-nnoremap ]q :cnext<cr>zz
-nnoremap [q :cprev<cr>zz
-nnoremap ]l :lnext<cr>zz
-nnoremap [l :lprev<cr>zz
-
-" ----------------------------------------------------------------------------
-" Buffers
-" ----------------------------------------------------------------------------
-nnoremap ]b :bnext<cr>
-nnoremap [b :bprev<cr>
-
-" ----------------------------------------------------------------------------
-" Tabs
-" ----------------------------------------------------------------------------
-nnoremap ]t :tabn<cr>
-nnoremap [t :tabp<cr>
 
 " ----------------------------------------------------------------------------
 " Markdown headings
@@ -220,55 +184,21 @@ nnoremap <leader>4 m`^i#### <esc>``6l
 " ----------------------------------------------------------------------------
 " Moving lines
 " ----------------------------------------------------------------------------
-nnoremap <silent> <C-k> :move-2<cr>
-nnoremap <silent> <C-j> :move+<cr>
-nnoremap <silent> <C-h> <<
-nnoremap <silent> <C-l> >>
-xnoremap <silent> <C-k> :move-2<cr>gv
-xnoremap <silent> <C-j> :move'>+<cr>gv
-xnoremap <silent> <C-h> <gv
-xnoremap <silent> <C-l> >gv
-xnoremap < <gv
-xnoremap > >gv
+" nnoremap <silent> <C-k> :move-2<cr>
+" nnoremap <silent> <C-j> :move+<cr>
+" nnoremap <silent> <C-h> <<
+" nnoremap <silent> <C-l> >>
+" xnoremap <silent> <C-k> :move-2<cr>gv
+" xnoremap <silent> <C-j> :move'>+<cr>gv
+" xnoremap <silent> <C-h> <gv
+" xnoremap <silent> <C-l> >gv
+" xnoremap < <gv
+" xnoremap > >gv
 
 " ----------------------------------------------------------------------------
 " <Leader>c Close quickfix/location window
 " ----------------------------------------------------------------------------
 nnoremap <leader>c :cclose<bar>lclose<cr>
-
-" ----------------------------------------------------------------------------
-" #gi / #gpi | go to next/previous indentation level
-" ----------------------------------------------------------------------------
-function! s:go_indent(times, dir)
-  for _ in range(a:times)
-    let l = line('.')
-    let x = line('$')
-    let i = s:indent_len(getline(l))
-    let e = empty(getline(l))
-
-    while l >= 1 && l <= x
-      let line = getline(l + a:dir)
-      let l += a:dir
-      if s:indent_len(line) != i || empty(line) != e
-        break
-      endif
-    endwhile
-    let l = min([max([1, l]), x])
-    execute 'normal! '. l .'G^'
-  endfor
-endfunction
-nnoremap <silent> gi :<c-u>call <SID>go_indent(v:count1, 1)<cr>
-nnoremap <silent> gpi :<c-u>call <SID>go_indent(v:count1, -1)<cr>
-
-" ----------------------------------------------------------------------------
-" #!! | Shebang
-" ----------------------------------------------------------------------------
-inoreabbrev <expr> #!! "#!/usr/bin/env" . (empty(&filetype) ? '' : ' '.&filetype)
-
-" ----------------------------------------------------------------------------
-" Heytmux
-" ----------------------------------------------------------------------------
-xnoremap <leader>ht :Heytmux<cr>
 
 " }}}
 " ============================================================================
@@ -360,6 +290,35 @@ xnoremap <leader>! "gy:call <SID>goog(@g, 1)<cr>gv
 " Plugins
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 """""""""""""""""""""""""""""""
+" vim-markdown
+"""""""""""""""""""""""""""""""
+let g:vim_markdown_conceal=0
+
+" folding
+set foldmethod=indent
+
+"""""""""""""""""""""""""""""""
+" airline
+"""""""""""""""""""""""""""""""
+let g:airline_theme='gruvbox'
+let g:airline_powerline_fonts=1
+let g:airline_highlighting_cache=1
+
+let g:airline#extensions#tabline#enabled=1
+let g:airline#extensions#ale#enabled=1
+
+"""""""""""""""""""""""""""""""
+" gruvbox
+"""""""""""""""""""""""""""""""
+nnoremap <silent> [oh :call gruvbox#hls_show()<CR>
+nnoremap <silent> ]oh :call gruvbox#hls_hide()<CR>
+nnoremap <silent> coh :call gruvbox#hls_toggle()<CR>
+
+nnoremap * :let @/ = ""<CR>:call gruvbox#hls_show()<CR>*
+nnoremap / :let @/ = ""<CR>:call gruvbox#hls_show()<CR>/
+nnoremap ? :let @/ = ""<CR>:call gruvbox#hls_show()<CR>?
+
+"""""""""""""""""""""""""""""""
 " vim-sneak
 """""""""""""""""""""""""""""""
 let g:sneak#label = 0
@@ -445,89 +404,6 @@ let g:startify_session_dir = '~/.vim/sessions'
 nmap <F8> :TagbarToggle<CR>
 nmap <F9> :TagbarTogglePause<CR>
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => gruvbox
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:gruvbox_contrast_dark = 'hard'
-let g:gruvbox_improved_strings = '1'
-let g:gruvbox_improved_warnings = '1'
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => airline
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:airline_powerline_fonts = 1
-let g:airline_highlighting_cache = 1
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#ale#enabled = 1
-let g:airline_extensions = ['branch', 'tabline', 'hunks', 'whitespace']
-let g:airline_theme='gruvbox'
-
-"""""""""""""""""""""""""""""""
-" vim-go
-"""""""""""""""""""""""""""""""
-set autowrite
-
-" quickfix list
-let g:go_list_type = "quickfix"
-autocmd FileType qf wincmd J
-
-map <C-n> :cnext<CR>
-map <C-p> :cprevious<CR>
-nnoremap <leader>a :cclose<CR>
-
-autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
-
-let g:go_fmt_command = "gofmt"
-
-" beautify
-let g:go_highlight_types = 1
-let g:go_highlight_extra_types = 0
-let g:go_highlight_functions = 1
-let g:go_highlight_function_calls = 1
-let g:go_highlight_build_constraints = 0
-let g:go_highlight_generate_tags = 0
-let g:go_highlight_array_whitespace_error = 0
-let g:go_highlight_chan_whitespace_error = 0
-let g:go_highlight_space_tab_error = 0
-let g:go_highlight_trailing_whitespace_error = 0
-let g:go_highlight_operators = 0
-let g:go_highlight_function_arguements = 0
-let g:go_highlight_fields = 0
-let g:go_highlight_string_spellcheck = 0
-let g:go_highlight_format_strings = 0
-let g:go_highlight_variable_declarations = 0
-let g:go_highlight_variable_assignments = 0
-
-" check it
-let g:go_metalinter_enabled = []
-let g:go_metalinter_autosave = 0
-
-" navigate it
-autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
-autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
-autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
-
-let g:go_def_mode = 'godef'
-
-let g:go_decls_includes = "func, type"
-
-" understand it
-autocmd FileType go nmap <Leader>i <Plug>(go-info)
-let g:go_auto_type_info = 1
-" set updatetime=100
-
-let g:go_auto_sameids = 1
-
-" helper functions
-function! s:build_go_files()
-    let l:file = expand('%')
-    if l:file =~# '^\f\+_test\.go$'
-        call go#test#Test(0,1)
-    elseif l:file =~# '^\f\+\.go$'
-        call go#cmd#Build(0)
-    endif
-endfunction
-
 """""""""""""""""""""""""""""""""
 " Vim-Sessions
 """""""""""""""""""""""""""""""""
@@ -539,51 +415,51 @@ let g:session_autoload = "no"
 let g:session_lock_enabled = 0
 
 """""""""""""""""""""""""""""""""
-" gocode
-"""""""""""""""""""""""""""""""""
-let g:go_gocode_propose_builtins = 1
-let g:gocode_propose_source = 1
-
-:highlight Pmenu guibg=brown gui=bold
-:highlight Pmenu ctermbg=238 gui=bold
-
-"""""""""""""""""""""""""""""""""
 " gitgutter
 """""""""""""""""""""""""""""""""
 let g:gitgutter_enabled = 1
 let g:gitgutter_terminal_reports_focus = 0
 let g:gitgutter_max_signs = 500
-nmap <leader>cv <Plug>GitGutterPreviewHunk
+nmap <leader>hv <Plug>GitGutterPreviewHunk
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ALE
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:ale_set_loclist = 1
 let g:ale_set_highlights = 1
 let g:ale_set_signs = 1
+
 let g:ale_fixers = {
 \   '*': ['remove_trailing_lines', 'trim_whitespace'],
 \   'go': ['gofmt', 'goimports'],
+\   'javascript': ['prettier'],
+\   'typescript': ['prettier'],
+\   'JSON': ['prettier'],
+\   'YAML': ['prettier'],
 \}
 let g:ale_fix_on_save = 1
 
 let g:ale_linters = {
-\   'javascript': ['jshint'],
+\   'javascript': ['prettier'],
+\   'typescript': ['prettier'],
 \   'python': ['flake8'],
 \   'Dockerfile': ['hadolint'],
 \   'go': ['golangci-lint'],
 \   'JSON': ['prettier'],
 \   'YAML': ['prettier'],
+\   'proto': ['prototool-lint'],
 \}
 let g:ale_lint_on_text_changed = 'never'
 let g:ale_lint_on_save = 1
-let g:ale_lint_on_enter = 0
+let g:ale_lint_on_enter = 1
 
-let g:ale_go_golangci_lint_executable = 'golangci-lint'
-let g:ale_go_golangci_lint_options = '-E golint'
-
+let g:ale_go_golangci_lint_options = '--disable gochecknoglobals --disable gochecknoinits'
+let g:ale_go_golangci_lint_package = 1
 
 nmap ]a <Plug>(ale_next_wrap)
 nmap [a <Plug>(ale_previous_wrap)
+
+nnoremap <silent> <leader>f :call PrototoolFormatFix()<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Tagbar
@@ -618,22 +494,6 @@ let g:tagbar_type_go = {
 \ }
 
 " ----------------------------------------------------------------------------
-" YCM
-" ----------------------------------------------------------------------------
-" autocmd vimrc FileType c,cpp,go nnoremap <buffer> ]d :YcmCompleter GoTo<CR>
-" autocmd vimrc FileType c,cpp    nnoremap <buffer> K  :YcmCompleter GetType<CR>
-
-" ----------------------------------------------------------------------------
-" ack.vim
-" ----------------------------------------------------------------------------
-if executable('ag')
-  let &grepprg = 'ag --nogroup --nocolor --column'
-else
-  let &grepprg = 'grep -rn $* *'
-endif
-command! -nargs=1 -bar Grep execute 'silent! grep! <q-args>' | redraw! | copen
-
-" ----------------------------------------------------------------------------
 " vim-commentary
 " ----------------------------------------------------------------------------
 map  gc  <Plug>Commentary
@@ -651,14 +511,66 @@ nnoremap <Leader>d :Gdiff<CR>
 let NERDTreeShowHidden=1
 
 " ----------------------------------------------------------------------------
-" NERDtree
+" UltiSnips
 " ----------------------------------------------------------------------------
 let g:UltiSnipsExpandTrigger = "<c-j>"
 let g:UltiSnipsJumpForwardTrigger = "<c-j>"
 let g:UltiSnipsJumpBackwardTrigger = "<c-k>"
 
+let g:UltiSnipsEditSplit = "vertical"
+
+set rtp+=~/.vim/ftdetect/
+let g:UltiSnipsSnippetsDir="~/.vim/ftdetect/UltiSnips"
+
+
 " ----------------------------------------------------------------------------
-" vim-dadbod
+" Conquer of Completion
 " ----------------------------------------------------------------------------
-let g:agnusdev = "postgresql://agnusprod:f9yP2uiEPbdLwfNm@35.232.235.96:5432/agnusgis"
-let g:agnusprod = "postgresql://agnusprod:f9yP2uiEPbdLwfNm@104.198.245.110:5432/agnusgis"
+
+" Use `[c` and `]c` for navigate diagnostics
+nmap <silent> [c <Plug>(coc-diagnostic-prev)
+nmap <silent> ]c <Plug>(coc-diagnostic-next)
+
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use K for show documentation in preview window
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if &filetype == 'vim'
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" Highlight symbol under cursor or CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" ----------------------------------------------------------------------------
+" Formatters
+" ----------------------------------------------------------------------------
+function! FormatSQL() range
+  execute a:firstline . "," . a:lastline . "!sqlf rmat --reindent --keywords upper --identifiers lower -a -"
+endfunction
+command! -range FormatSQL <line1>,<line2>call FormatSQL()
+
+function! FormatJSON() range
+  execute a:firstline . "," . a:lastline . "!python -m json.tool"
+endfunction
+command! -range FormatJSON <line1>,<line2>call FormatJSON()
+
+" ----------------------------------------------------------------------------
+" vim-easy-align
+" ----------------------------------------------------------------------------
+xmap ga <Plug>(EasyAlign)
+xmap ga <Plug>(EasyAlign)
+
+" ----------------------------------------------------------------------------
+" vim-delve
+" ----------------------------------------------------------------------------
+let g:delve_backend = "lldb"

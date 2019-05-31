@@ -61,12 +61,17 @@ export UPDATE_ZSH_DAYS=7
 
 # ENV variables
 # =============
+export PATH="/Users/thomas/.bin:$PATH"
+
 # go
 export GOPATH="$HOME/Code/go"
 export GOBIN="$GOPATH/bin"
-export GOCACHE=true
+export GOCACHE=""
 export PATH="$GOBIN:$PATH"
 export PATH="/usr/local/bin:$PATH"
+
+# swift
+export SOURCEKIT_TOOLCHAIN_PATH="/Library/Developer/Toolchains/swift-latest.xctoolchain"
 
 #tmux
 : ${ZSH_TMUX_AUTOSTART=true}
@@ -79,7 +84,7 @@ export PATH="$HOME/google-cloud-sdk/bin:$PATH"
 
 # misc
 export CLICOLOR=1
-export TERM=xterm-256color
+export TERM=screen-256color
 
 # todo.txt
 export TODOTXT_DEFAULT_ACTION=ls
@@ -90,6 +95,10 @@ export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export FZF_CTRL_T_COMMAND='fd --type f --type d --hidden --follow --exclude .git'
 export FZF_CTRL_T_OPTS="--preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -500' --preview-window right:100:wrap"
 export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:hidden:wrap --bind '?:toggle-preview' --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort' --header 'Press CTRL-Y to copy command into clipboard' --border"
+
+# protoc
+export PATH="$HOME/protoc-3.7.1-osx-x86_64/bin:$PATH"
+
 # =============
 
 # Aliases
@@ -101,7 +110,7 @@ alias t='todo.sh -cNt -d /Users/thomas/.config/todo/todo.cfg'
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git gitfast git-extras repo docker docker-compose tmux tmuxinator vi-mode web-search autojump colorize history golang redis-cli jsontools urltools osx brew gem  pip xcode pod zsh-autosuggestions fzf kubectl httpie)
+plugins=(git gitfast git-extras repo docker docker-compose tmux tmuxinator vi-mode web-search autojump colorize history golang redis-cli jsontools urltools osx brew gem  pip xcode pod zsh-autosuggestions fzf kubectl httpie terraform)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -112,7 +121,7 @@ source $ZSH/oh-my-zsh.sh
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 # Preferred editor for local and remote sessions
-export EDITOR='vim'
+export EDITOR='nvim'
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -202,3 +211,11 @@ source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 # Completion
 source ~/.bin/tmuxinator.zsh
 source ~/.bin/todo_completion.sh
+
+# ==========================================================================================
+# Gruvbox
+source "$HOME/.vim/plugged/gruvbox/gruvbox_256palette.sh"
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
