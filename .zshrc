@@ -69,6 +69,7 @@ export GOBIN="$GOPATH/bin"
 export GOCACHE=""
 export PATH="$GOBIN:$PATH"
 export PATH="/usr/local/bin:$PATH"
+export GO111MODULE=on
 
 # swift
 export SOURCEKIT_TOOLCHAIN_PATH="/Library/Developer/Toolchains/swift-latest.xctoolchain"
@@ -97,7 +98,7 @@ export FZF_CTRL_T_OPTS="--preview '(highlight -O ansi -l {} 2> /dev/null || cat 
 export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:hidden:wrap --bind '?:toggle-preview' --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort' --header 'Press CTRL-Y to copy command into clipboard' --border"
 
 # protoc
-export PATH="$HOME/protoc-3.7.1-osx-x86_64/bin:$PATH"
+export PATH="$HOME/protoc/bin:$PATH"
 
 # =============
 
@@ -219,3 +220,5 @@ source "$HOME/.vim/plugged/gruvbox/gruvbox_256palette.sh"
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+# Hook for desk activation
+[ -n "$DESK_ENV" ] && source "$DESK_ENV" || true

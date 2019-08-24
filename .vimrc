@@ -1,16 +1,12 @@
 call plug#begin('~/.vim/plugged')
 
-Plug 'vim-airline/vim-airline' | Plug 'vim-airline/vim-airline-themes'
-Plug 'edkolev/tmuxline.vim'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'mhinz/vim-startify'
 Plug 'majutsushi/tagbar'
-Plug 'scrooloose/nerdtree'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'vimwiki/vimwiki'
 
-Plug 'rizzatti/dash.vim'
 Plug 'w0rp/ale'
 Plug 'uber/prototool', { 'rtp':'vim/prototool' }
 
@@ -19,7 +15,6 @@ Plug 'airblade/vim-gitgutter'
 
 Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
 Plug 'AndrewRadev/splitjoin.vim'
-Plug 'justinmk/vim-sneak'
 Plug 'junegunn/vim-easy-align'
 Plug 'neoclide/coc.nvim', { 'do': { -> coc#util#install()} }
 
@@ -28,11 +23,9 @@ Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-sensible'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-dadbod'
 Plug 'tpope/vim-abolish'
 
 Plug 'morhetz/gruvbox'
-Plug 'keith/swift.vim'
 Plug 'plasticboy/vim-markdown'
 Plug 'hashivim/vim-terraform'
 
@@ -72,7 +65,7 @@ set visualbell
 set backspace=indent,eol,start
 set timeoutlen=500
 set whichwrap=b,s
-set shortmess=aIT
+set shortmess=aITc
 set hlsearch " CTRL-L / CTRL-R W
 set incsearch
 set hidden
@@ -98,6 +91,12 @@ set nocursorline
 set nopaste
 set nrformats=hex
 silent! set cryptmethod=blowfish2
+set nobackup
+set nowritebackup
+set cmdheight=2
+set updatetime=300
+set signcolumn=yes
+
 
 set modelines=2
 set synmaxcol=1000
@@ -149,14 +148,6 @@ nnoremap <leader>s :update<cr>
 nnoremap <Leader>q :q<cr>
 nnoremap <Leader>Q :qa!<cr>
 
-" <leader>n | NERD Tree
-nnoremap <leader>n :NERDTreeToggle<cr>
-
-" jk | Escaping!
-inoremap jk <Esc>
-xnoremap jk <Esc>
-cnoremap jk <C-c>
-
 " Make Y behave like other capitals
 nnoremap Y y$
 
@@ -173,6 +164,17 @@ inoremap <F10> <C-o>:syntax sync fromstart<CR>
 " search and replace visual selection
 vnoremap <C-r> "hy:%s/<C-r>h//g<left><left>
 
+" window resize shortcuts
+nnoremap <silent> + :exe "resize +15"<CR>
+nnoremap <silent> - :exe "resize -15"<CR>
+nnoremap <silent> <c-m> :exe "vertical resize +30"<CR>
+nnoremap <silent> <c-n> :exe "vertical resize -30"<CR>
+
+" neovim terminal
+command! -nargs=* T split | terminal <args>
+command! -nargs=* VT vsplit | terminal <args>
+command! -nargs=* VTS vsplit | vertical resize 90 | terminal <args>
+
 " ----------------------------------------------------------------------------
 " Markdown headings
 " ----------------------------------------------------------------------------
@@ -182,23 +184,10 @@ nnoremap <leader>3 m`^i### <esc>``4l
 nnoremap <leader>4 m`^i#### <esc>``6l
 
 " ----------------------------------------------------------------------------
-" Moving lines
-" ----------------------------------------------------------------------------
-" nnoremap <silent> <C-k> :move-2<cr>
-" nnoremap <silent> <C-j> :move+<cr>
-" nnoremap <silent> <C-h> <<
-" nnoremap <silent> <C-l> >>
-" xnoremap <silent> <C-k> :move-2<cr>gv
-" xnoremap <silent> <C-j> :move'>+<cr>gv
-" xnoremap <silent> <C-h> <gv
-" xnoremap <silent> <C-l> >gv
-" xnoremap < <gv
-" xnoremap > >gv
-
-" ----------------------------------------------------------------------------
 " <Leader>c Close quickfix/location window
 " ----------------------------------------------------------------------------
 nnoremap <leader>c :cclose<bar>lclose<cr>
+
 
 " }}}
 " ============================================================================
@@ -526,7 +515,6 @@ let g:UltiSnipsSnippetsDir="~/.vim/ftdetect/UltiSnips"
 " ----------------------------------------------------------------------------
 " Conquer of Completion
 " ----------------------------------------------------------------------------
-
 " Use `[c` and `]c` for navigate diagnostics
 nmap <silent> [c <Plug>(coc-diagnostic-prev)
 nmap <silent> ]c <Plug>(coc-diagnostic-next)
@@ -541,14 +529,14 @@ nmap <silent> gr <Plug>(coc-references)
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 function! s:show_documentation()
-  if &filetype == 'vim'
+  if (index(['vim','help'], &filetype) >= 0)
     execute 'h '.expand('<cword>')
   else
     call CocAction('doHover')
   endif
 endfunction
 
-" Highlight symbol under cursor or CursorHold
+" Highlight symbol under cursor on CursorHold
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
 " ----------------------------------------------------------------------------
