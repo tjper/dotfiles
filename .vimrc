@@ -1,23 +1,31 @@
 call plug#begin('~/.vim/plugged')
 
-Plug 'christoomey/vim-tmux-navigator'
 Plug 'mhinz/vim-startify'
-Plug 'majutsushi/tagbar'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
-Plug 'vimwiki/vimwiki'
 
-Plug 'w0rp/ale'
-Plug 'uber/prototool', { 'rtp':'vim/prototool' }
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend updating the parsers on update
+Plug 'neovim/nvim-lspconfig'
 
-Plug 'tpope/vim-fugitive'
-Plug 'airblade/vim-gitgutter'
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'hrsh7th/cmp-buffer'
+Plug 'hrsh7th/cmp-path'
+Plug 'hrsh7th/cmp-cmdline'
+Plug 'hrsh7th/nvim-cmp'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+Plug 'quangnguyen30192/cmp-nvim-ultisnips'
 
-Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
+Plug 'nvim-lua/popup.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'norcalli/nvim-colorizer.lua'
+Plug 'dense-analysis/ale'
+
+Plug 'arcticicestudio/nord-vim'
+
 Plug 'AndrewRadev/splitjoin.vim'
 Plug 'junegunn/vim-easy-align'
-Plug 'neoclide/coc.nvim', { 'do': { -> coc#util#install()} }
 
+Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-sensible'
@@ -25,24 +33,19 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-abolish'
 
-Plug 'morhetz/gruvbox'
-Plug 'plasticboy/vim-markdown'
-Plug 'hashivim/vim-terraform'
-
-Plug 'leafgarland/typescript-vim'
-Plug 'sebdah/vim-delve'
+Plug 'mattn/emmet-vim'
 
 call plug#end()
 
 " """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Display
 " """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-syntax enable
-set background=dark
-let g:gruvbox_contrast_dark='hard'
-let g:gruvbox_invert_indent_guides='0'
-colorscheme gruvbox
-
+colorscheme nord
+let g:nord_cursor_line_number_background = 1
+let g:nord_bold = 1
+let g:nord_italic = 1
+let g:nord_italic_comments = 1
+let g:nord_underline = 1
 
 " """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Basic Settings
@@ -75,7 +78,7 @@ set wildmode=full
 set tabstop=2
 set shiftwidth=2
 set expandtab smarttab
-set scrolloff=5
+set scrolloff=0
 set encoding=utf-8
 set list
 set listchars=tab:\|\ ,
@@ -83,10 +86,10 @@ set virtualedit=block
 set nojoinspaces
 set diffopt=filler,vertical
 set autoread
-set clipboard=unnamed
+set clipboard+=unnamedplus
 set foldlevelstart=99
 set grepformat=%f:%l:%c:%m,%f:%l:%m
-set completeopt=menuone,preview
+set completeopt=menu,menuone,noselect
 set nocursorline
 set nopaste
 set nrformats=hex
@@ -96,6 +99,8 @@ set nowritebackup
 set cmdheight=2
 set updatetime=300
 set signcolumn=yes
+set foldmethod=indent
+set termguicolors
 
 
 set modelines=2
@@ -194,72 +199,6 @@ nnoremap <leader>c :cclose<bar>lclose<cr>
 " FUNCTIONS & COMMANDS {{{
 " ============================================================================
 " ----------------------------------------------------------------------------
-" <F5> / <F6> | Run script
-" ----------------------------------------------------------------------------
-function! s:run_this_script(output)
-  let head   = getline(1)
-  let pos    = stridx(head, '#!')
-  let file   = expand('%:p')
-  let ofile  = tempname()
-  let rdr    = " 2>&1 | tee ".ofile
-  let win    = winnr()
-  let prefix = a:output ? 'silent !' : '!'
-  " Shebang found
-  if pos != -1
-    execute prefix.strpart(head, pos + 2).' '.file.rdr
-  " Shebang not found but executable
-  elseif executable(file)
-    execute prefix.file.rdr
-  elseif &filetype == 'ruby'
-    execute prefix.'/usr/bin/env ruby '.file.rdr
-  elseif &filetype == 'tex'
-    execute prefix.'latex '.file. '; [ $? -eq 0 ] && xdvi '. expand('%:r').rdr
-  elseif &filetype == 'dot'
-    let svg = expand('%:r') . '.svg'
-    let png = expand('%:r') . '.png'
-    " librsvg >> imagemagick + ghostscript
-    execute 'silent !dot -Tsvg '.file.' -o '.svg.' && '
-          \ 'rsvg-convert -z 2 '.svg.' > '.png.' && open '.png.rdr
-  else
-    return
-  end
-  redraw!
-  if !a:output | return | endif
-
-  " Scratch buffer
-  if exists('s:vim_exec_buf') && bufexists(s:vim_exec_buf)
-    execute bufwinnr(s:vim_exec_buf).'wincmd w'
-    %d
-  else
-    silent!  bdelete [vim-exec-output]
-    silent!  vertical botright split new
-    silent!  file [vim-exec-output]
-    setlocal buftype=nofile bufhidden=wipe noswapfile
-    let      s:vim_exec_buf = winnr()
-  endif
-  execute 'silent! read' ofile
-  normal! gg"_dd
-  execute win.'wincmd w'
-endfunction
-nnoremap <silent> <F5> :call <SID>run_this_script(0)<cr>
-nnoremap <silent> <F6> :call <SID>run_this_script(1)<cr>
-
-" ----------------------------------------------------------------------------
-" Profile
-" ----------------------------------------------------------------------------
-function! s:profile(bang)
-  if a:bang
-    profile pause
-    noautocmd qall
-  else
-    profile start /tmp/profile.log
-    profile func *
-    profile file *
-  endif
-endfunction
-command! -bang Profile call s:profile(<bang>0)
-
-" ----------------------------------------------------------------------------
 " <Leader>?/! | Google it / Feeling lucky
 " ----------------------------------------------------------------------------
 function! s:goog(pat, lucky)
@@ -278,13 +217,11 @@ xnoremap <leader>! "gy:call <SID>goog(@g, 1)<cr>gv
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Plugins
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"""""""""""""""""""""""""""""""
-" vim-markdown
-"""""""""""""""""""""""""""""""
-let g:vim_markdown_conceal=0
 
-" folding
-set foldmethod=indent
+"""""""""""""""""""""""""""""""
+" python3
+"""""""""""""""""""""""""""""""
+let g:python3_host_prog='/bin/python3'
 
 """""""""""""""""""""""""""""""
 " airline
@@ -294,86 +231,6 @@ let g:airline_powerline_fonts=1
 let g:airline_highlighting_cache=1
 
 let g:airline#extensions#tabline#enabled=1
-let g:airline#extensions#ale#enabled=1
-
-"""""""""""""""""""""""""""""""
-" gruvbox
-"""""""""""""""""""""""""""""""
-nnoremap <silent> [oh :call gruvbox#hls_show()<CR>
-nnoremap <silent> ]oh :call gruvbox#hls_hide()<CR>
-nnoremap <silent> coh :call gruvbox#hls_toggle()<CR>
-
-nnoremap * :let @/ = ""<CR>:call gruvbox#hls_show()<CR>*
-nnoremap / :let @/ = ""<CR>:call gruvbox#hls_show()<CR>/
-nnoremap ? :let @/ = ""<CR>:call gruvbox#hls_show()<CR>?
-
-"""""""""""""""""""""""""""""""
-" vim-sneak
-"""""""""""""""""""""""""""""""
-let g:sneak#label = 0
-
-"""""""""""""""""""""""""""""""
-" fzf
-"""""""""""""""""""""""""""""""
-
-" Hide statusline of terminal buffer
-autocmd! FileType fzf
-autocmd  FileType fzf set laststatus=0 noshowmode noruler
-  \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
-
-let g:fzf_colors =
-\ { 'fg':      ['fg', 'Normal'],
-  \ 'bg':      ['bg', 'Normal'],
-  \ 'hl':      ['fg', 'Comment'],
-  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-  \ 'hl+':     ['fg', 'Statement'],
-  \ 'info':    ['fg', 'PreProc'],
-  \ 'border':  ['fg', 'Ignore'],
-  \ 'prompt':  ['fg', 'Conditional'],
-  \ 'pointer': ['fg', 'Exception'],
-  \ 'marker':  ['fg', 'Keyword'],
-  \ 'spinner': ['fg', 'Label'],
-  \ 'header':  ['fg', 'Comment'] }
-
-command! -bang -nargs=? -complete=dir Files
-  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
-
-" nnoremap <silent> <Leader><Leader> :Files<CR>
-nnoremap <silent> <expr> <Leader><Leader> (expand('%') =~ 'NERD_tree' ? "\<c-w>\<c-w>" : '').":Files\<cr>"
-nnoremap <silent> <Leader>B :Buffers<CR>
-nnoremap <silent> <Leader>L :Lines<CR>
-nnoremap <silent> <Leader>c :Tags <C-R><C-W><CR>
-nnoremap <silent> <Leader>C :Tags <CR>
-nnoremap <silent> <Leader>ag :Rg <C-R><C-W><CR>
-nnoremap <silent> <Leader>AG :Rg <CR>
-xnoremap <silent> <Leader>ag y:Rg <C-R>"<CR>
-
-function! s:plug_help_sink(line)
-  let dir = g:plugs[a:line].dir
-  for pat in ['doc/*.txt', 'README.md']
-    let match = get(split(globpath(dir, pat), "\n"), 0, '')
-    if len(match)
-      execute 'tabedit' match
-      return
-    endif
-  endfor
-  tabnew
-  execute 'Explore' dir
-endfunction
-
-command! PlugHelp call fzf#run(fzf#wrap({
-  \ 'source': sort(keys(g:plugs)),
-  \ 'sink':   function('s:plug_help_sink')}))
-
-" fzf#vim#grep
-command! -bang -nargs=* Rg
-  \ call fzf#vim#grep(
-  \   'rg --column --line-number --no-heading --color=never --smart-case '.shellescape(<q-args>), 1,
-  \   <bang>0 ? fzf#vim#with_preview('up:60%')
-  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
-  \   <bang>0)
-
 
 """"""""""""""""""""""""""""""
 " indentLine
@@ -386,101 +243,6 @@ set list lcs=tab:\|\
 " Startify
 """"""""""""""""""""""""""""""
 let g:startify_session_dir = '~/.vim/sessions'
-
-""""""""""""""""""""""""""""""
-" Tagbar
-""""""""""""""""""""""""""""""
-nmap <F8> :TagbarToggle<CR>
-nmap <F9> :TagbarTogglePause<CR>
-
-"""""""""""""""""""""""""""""""""
-" Vim-Sessions
-"""""""""""""""""""""""""""""""""
-set sessionoptions-=tabpages
-set sessionoptions-=buffers
-set sessionoptions-=options
-let g:session_autosave = "no"
-let g:session_autoload = "no"
-let g:session_lock_enabled = 0
-
-"""""""""""""""""""""""""""""""""
-" gitgutter
-"""""""""""""""""""""""""""""""""
-let g:gitgutter_enabled = 1
-let g:gitgutter_terminal_reports_focus = 0
-let g:gitgutter_max_signs = 500
-nmap <leader>hv <Plug>GitGutterPreviewHunk
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" ALE
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:ale_set_loclist = 1
-let g:ale_set_highlights = 1
-let g:ale_set_signs = 1
-
-let g:ale_fixers = {
-\   '*': ['remove_trailing_lines', 'trim_whitespace'],
-\   'go': ['gofmt', 'goimports'],
-\   'javascript': ['prettier'],
-\   'typescript': ['prettier'],
-\   'JSON': ['prettier'],
-\   'YAML': ['prettier'],
-\}
-let g:ale_fix_on_save = 1
-
-let g:ale_linters = {
-\   'javascript': ['prettier'],
-\   'typescript': ['prettier'],
-\   'python': ['flake8'],
-\   'Dockerfile': ['hadolint'],
-\   'go': ['golangci-lint'],
-\   'JSON': ['prettier'],
-\   'YAML': ['prettier'],
-\   'proto': ['prototool-lint'],
-\}
-let g:ale_lint_on_text_changed = 'never'
-let g:ale_lint_on_save = 1
-let g:ale_lint_on_enter = 1
-
-let g:ale_go_golangci_lint_options = '--disable gochecknoglobals --disable gochecknoinits'
-let g:ale_go_golangci_lint_package = 1
-
-nmap ]a <Plug>(ale_next_wrap)
-nmap [a <Plug>(ale_previous_wrap)
-
-nnoremap <silent> <leader>f :call PrototoolFormatFix()<CR>
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Tagbar
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:tagbar_sort = 0
-let g:tagbar_type_go = {
-    \ 'ctagstype' : 'go',
-    \ 'kinds'     : [
-        \ 'p:package',
-        \ 'i:imports:1',
-        \ 'c:constants',
-        \ 'v:variables',
-        \ 't:types',
-        \ 'n:interfaces',
-        \ 'w:fields',
-        \ 'e:embedded',
-        \ 'm:methods',
-        \ 'r:constructor',
-        \ 'f:functions'
-    \ ],
-    \ 'sro' : '.',
-    \ 'kind2scope' : {
-        \ 't' : 'ctype',
-        \ 'n' : 'ntype'
-    \ },
-    \ 'scope2kind' : {
-        \ 'ctype' : 't',
-        \ 'ntype' : 'n'
-    \ },
-    \ 'ctagsbin'  : 'gotags',
-    \ 'ctagsargs' : '-sort -silent'
-\ }
 
 " ----------------------------------------------------------------------------
 " vim-commentary
@@ -508,37 +270,6 @@ let g:UltiSnipsJumpBackwardTrigger = "<c-k>"
 
 let g:UltiSnipsEditSplit = "vertical"
 
-set rtp+=~/.vim/ftdetect/
-let g:UltiSnipsSnippetsDir="~/.vim/ftdetect/UltiSnips"
-
-
-" ----------------------------------------------------------------------------
-" Conquer of Completion
-" ----------------------------------------------------------------------------
-" Use `[c` and `]c` for navigate diagnostics
-nmap <silent> [c <Plug>(coc-diagnostic-prev)
-nmap <silent> ]c <Plug>(coc-diagnostic-next)
-
-" Remap keys for gotos
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-
-" Use K for show documentation in preview window
-nnoremap <silent> K :call <SID>show_documentation()<CR>
-
-function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  else
-    call CocAction('doHover')
-  endif
-endfunction
-
-" Highlight symbol under cursor on CursorHold
-autocmd CursorHold * silent call CocActionAsync('highlight')
-
 " ----------------------------------------------------------------------------
 " Formatters
 " ----------------------------------------------------------------------------
@@ -562,3 +293,188 @@ xmap ga <Plug>(EasyAlign)
 " vim-delve
 " ----------------------------------------------------------------------------
 let g:delve_backend = "lldb"
+
+" ----------------------------------------------------------------------------
+" WSL yank support
+" ----------------------------------------------------------------------------
+let s:clip = '/mnt/c/Windows/System32/clip.exe'  " change this path according to your mount point
+if executable(s:clip)
+    augroup WSLYank
+        autocmd!
+        autocmd TextYankPost * if v:event.operator ==# 'y' | call system(s:clip, @0) | endif
+    augroup END
+endif
+
+" ----------------------------------------------------------------------------
+" Emmet
+" ----------------------------------------------------------------------------
+let g:user_emmet_leader_key=','
+
+" ----------------------------------------------------------------------------
+" nvim-cmp
+" ----------------------------------------------------------------------------
+lua << EOF
+  -- Setup nvim-cmp.
+  local cmp = require'cmp'
+
+  cmp.setup({
+    snippet = {
+      expand = function(args)
+        vim.fn["UltiSnips#Anon"](args.body)
+      end,
+    },
+    mapping = {
+      ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
+      ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
+      ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
+      ['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
+      ['<C-e>'] = cmp.mapping({
+        i = cmp.mapping.abort(),
+        c = cmp.mapping.close(),
+      }),
+      ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+    },
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      { name = 'ultisnips' },
+    }, {
+      { name = 'buffer' },
+    })
+  })
+
+  -- Set configuration for specific filetype.
+  cmp.setup.filetype('gitcommit', {
+    sources = cmp.config.sources({
+      { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
+    }, {
+      { name = 'buffer' },
+    })
+  })
+
+  -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline('/', {
+    sources = {
+      { name = 'buffer' }
+    }
+  })
+
+  -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+  cmp.setup.cmdline(':', {
+    sources = cmp.config.sources({
+      { name = 'path' }
+    }, {
+      { name = 'cmdline' }
+    })
+  })
+EOF
+
+" ----------------------------------------------------------------------------
+" neovim lsp
+" ----------------------------------------------------------------------------
+lua << EOF
+-- Use an on_attach function to only map the following keys
+-- after the language server attaches to the current buffer
+local on_attach = function(client, bufnr)
+  local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+  local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
+
+  -- Mappings.
+  local opts = { noremap=true, silent=true }
+  vim.api.nvim_set_keymap('n', '<leader>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
+  vim.api.nvim_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
+  vim.api.nvim_set_keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
+  vim.api.nvim_set_keymap('n', '<leader>q', '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
+
+  -- See `:help vim.lsp.*` for documentation on any of the below functions
+  buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+  buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+  buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+  buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+  buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+  buf_set_keymap('n', '<leader>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
+  buf_set_keymap('n', '<leader>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
+  buf_set_keymap('n', '<leader>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+  buf_set_keymap('n', '<leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+  buf_set_keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+  buf_set_keymap('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+  buf_set_keymap("n", "<leader>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+end
+
+local nvim_lsp = require('lspconfig')
+local nvim_cmp = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+
+-- configure each language server
+-- map buffer local keybindings to each language server when attaching
+nvim_lsp.gopls.setup {
+  on_attach = on_attach,
+  capabilities = nvim_cmp,
+}
+
+nvim_lsp.tsserver.setup {
+  on_attach = on_attach,
+  init_options = {documentFormatting = false},
+  capabilities = nvim_cmp,
+}
+
+nvim_lsp.tailwindcss.setup{
+  capabilities = nvim_cmp,
+}
+EOF
+
+
+" ----------------------------------------------------------------------------
+" telescope
+" ----------------------------------------------------------------------------
+" Find files using Telescope command-line sugar.
+nnoremap <leader><leader> <cmd>Telescope find_files<cr>
+nnoremap <leader>ag <cmd>Telescope live_grep<cr>
+nnoremap <leader>b <cmd>Telescope buffers<cr>
+nnoremap <leader>h <cmd>Telescope help_tags<cr>
+
+" ----------------------------------------------------------------------------
+" treesitter
+" ----------------------------------------------------------------------------
+lua << EOF
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = {
+    'go', 'html', 'javascript', 'python', 'ruby', 'rust', 'typescript', 'yaml',
+    'comment', 'lua', 'regex', 'scss', 'tsx', 'graphql', 'dockerfile', 'make'
+  },
+  highlight = {
+    enable = true
+  },
+}
+EOF
+
+" ----------------------------------------------------------------------------
+" nvim-colorizer
+" ----------------------------------------------------------------------------
+lua << EOF
+require'colorizer'.setup()
+EOF
+
+" ----------------------------------------------------------------------------
+" ale
+" ----------------------------------------------------------------------------
+let g:ale_completion_enabled = 0
+let g:ale_disable_lsp = 1
+let g:ale_fix_on_save = 1
+let g:ale_go_golangci_lint_package = 1
+
+let g:ale_fixers = {
+\   '*': ['remove_trailing_lines', 'trim_whitespace'],
+\   'javascript': ['eslint', 'prettier'],
+\   'javascript.jsx': ['eslint', 'prettier'],
+\   'typescript': ['eslint', 'prettier'],
+\   'typescriptreact': ['eslint', 'prettier'],
+\   'go': ['gofmt', 'goimports'],
+\}
+
+let g:ale_linters = {
+\   'javascript': ['eslint', 'prettier'],
+\   'javascript.jsx': ['eslint', 'prettier'],
+\   'typescript': ['eslint', 'prettier'],
+\   'typescriptreact': ['eslint', 'prettier'],
+\   'go': ['golangci-lint'],
+\}

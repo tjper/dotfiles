@@ -1,14 +1,21 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/thomas/.oh-my-zsh"
+export ZSH="/home/james/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-ZSH_THEME="powerlevel9k/powerlevel9k"
+ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -61,7 +68,7 @@ export UPDATE_ZSH_DAYS=7
 
 # ENV variables
 # =============
-export PATH="/Users/thomas/.bin:$PATH"
+export PATH="/home/james/.bin:$PATH"
 
 # go
 export GOPATH="$HOME/Code/go"
@@ -71,25 +78,12 @@ export PATH="$GOBIN:$PATH"
 export PATH="/usr/local/bin:$PATH"
 export GO111MODULE=on
 
-# swift
-export SOURCEKIT_TOOLCHAIN_PATH="/Library/Developer/Toolchains/swift-latest.xctoolchain"
-
-#tmux
-: ${ZSH_TMUX_AUTOSTART=true}
-
 # fzf
 : ${FZF_BASE=/usr/local/opt/fzf}
-
-#gcloud
-export PATH="$HOME/google-cloud-sdk/bin:$PATH"
 
 # misc
 export CLICOLOR=1
 export TERM=screen-256color
-
-# todo.txt
-export TODOTXT_DEFAULT_ACTION=ls
-export TODOTXT_SORT_COMMAND='env LC_COLLATE=C sort -k 2,2 -k 1,1n'
 
 # FZF
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
@@ -97,21 +91,14 @@ export FZF_CTRL_T_COMMAND='fd --type f --type d --hidden --follow --exclude .git
 export FZF_CTRL_T_OPTS="--preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -500' --preview-window right:100:wrap"
 export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:hidden:wrap --bind '?:toggle-preview' --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort' --header 'Press CTRL-Y to copy command into clipboard' --border"
 
-# protoc
-export PATH="$HOME/protoc/bin:$PATH"
-
 # =============
-
-# Aliases
-alias mux='tmuxinator'
-alias t='todo.sh -cNt -d /Users/thomas/.config/todo/todo.cfg'
 
 # Which plugins would you like to load?
 # Standard plugins can be found in ~/.oh-my-zsh/plugins/*
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git gitfast git-extras repo docker docker-compose tmux tmuxinator vi-mode web-search autojump colorize history golang redis-cli jsontools urltools osx brew gem  pip xcode pod zsh-autosuggestions fzf kubectl httpie terraform)
+plugins=(git gitfast git-extras repo docker docker-compose vi-mode web-search autojump colorize history golang redis-cli jsontools urltools gem pip pod zsh-autosuggestions fzf kubectl httpie)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -140,85 +127,19 @@ export EDITOR='nvim'
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 # ==========================================================================================
-# POWERLEVEL9k
-DISABLE_AUTO_TITLE="true"
-
-
-# POWERLEVEL9K_MODE='awesome-patched'
-# POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-# POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="%{%F{249}%}\u250f"
-# POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="%{%F{249}%}\u2517%{%F{default}%} "
-# POWERLEVEL9K_SHORTEN_DIR_LENGTH=4
-# POWERLEVEL9K_SHORTEN_STRATEGY="truncate_middle"
-# POWERLEVEL9K_OS_ICON_BACKGROUND="black"
-# POWERLEVEL9K_OS_ICON_FOREGROUND="249"
-# POWERLEVEL9K_TODO_BACKGROUND="black"
-# POWERLEVEL9K_TODO_FOREGROUND="249"
-# POWERLEVEL9K_DIR_HOME_BACKGROUND="black"
-# POWERLEVEL9K_DIR_HOME_FOREGROUND="249"
-# POWERLEVEL9K_DIR_HOME_SUBFOLDER_BACKGROUND="black"
-# POWERLEVEL9K_DIR_HOME_SUBFOLDER_FOREGROUND="249"
-# POWERLEVEL9K_DIR_DEFAULT_BACKGROUND="black"
-# POWERLEVEL9K_DIR_DEFAULT_FOREGROUND="249"
-# POWERLEVEL9K_STATUS_OK_BACKGROUND="black"
-# POWERLEVEL9K_STATUS_OK_FOREGROUND="green"
-# POWERLEVEL9K_STATUS_ERROR_BACKGROUND="black"
-# POWERLEVEL9K_STATUS_ERROR_FOREGROUND="red"
-# POWERLEVEL9K_LOAD_CRITICAL_BACKGROUND="orange"
-# POWERLEVEL9K_LOAD_WARNING_BACKGROUND="yellow"
-# POWERLEVEL9K_LOAD_NORMAL_BACKGROUND="green"
-# POWERLEVEL9K_LOAD_CRITICAL_VISUAL_IDENTIFIER_COLOR="red"
-# POWERLEVEL9K_LOAD_WARNING_VISUAL_IDENTIFIER_COLOR="yellow"
-# POWERLEVEL9K_LOAD_NORMAL_VISUAL_IDENTIFIER_COLOR="green"
-# POWERLEVEL9K_RAM_BACKGROUND="yellow"
-# POWERLEVEL9K_RAM_ELEMENTS=(ram_free)
-# POWERLEVEL9K_TIME_BACKGROUND="yellow"
-# POWERLEVEL9K_TIME_FORMAT="%D{%H:%M:%S} "
-# POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=('status' 'os_icon' 'todo' 'context' 'dir' 'vcs')
-# POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=('nvm' 'rvm' 'load' 'ram' 'time')
-
-
-POWERLEVEL9K_OS_ICON_BACKGROUND="white"
-POWERLEVEL9K_OS_ICON_FOREGROUND="black"
-POWERLEVEL9K_TODO_BACKGROUND="black"
-POWERLEVEL9K_TODO_FOREGROUND="249"
-POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=''
-POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX='\uf0da'
-# POWERLEVEL9K_VCS_GIT_ICON='\ue60a'
-
-POWERLEVEL9K_VCS_MODIFIED_BACKGROUND='yellow'
-POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND='yellow'
-#POWERLEVEL9K_VCS_UNTRACKED_ICON='?'
-
-
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(os_icon todo dir vcs)
-POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(background_jobs ram load time )
-
-POWERLEVEL9K_SHORTEN_STRATEGY="truncate_from_right"
-POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
-
-POWERLEVEL9K_CUSTOM_TIME_FORMAT="%D{\uf017 %H:%M:%S}"
-# POWERLEVEL9K_TIME_FORMAT="%D{\uf017 %H:%M \uf073 %d.%m.%y}"
-
-POWERLEVEL9K_STATUS_VERBOSE=false
-
-POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-
-# ==========================================================================================
 # zsh-syntax-highlighting
-source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /home/james/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # ==========================================================================================
-# Completion
-source ~/.bin/tmuxinator.zsh
-source ~/.bin/todo_completion.sh
-
-# ==========================================================================================
-# Gruvbox
-source "$HOME/.vim/plugged/gruvbox/gruvbox_256palette.sh"
-
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 # Hook for desk activation
 [ -n "$DESK_ENV" ] && source "$DESK_ENV" || true
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
