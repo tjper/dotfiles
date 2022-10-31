@@ -9,7 +9,7 @@ fi
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/home/james/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -68,7 +68,8 @@ export UPDATE_ZSH_DAYS=7
 
 # ENV variables
 # =============
-export PATH="/home/james/.bin:$PATH"
+export PATH="$HOME/.bin:$PATH"
+export PATH="$HOME/Library/Python/3.8/bin:$PATH"
 
 # go
 export GOPATH="$HOME/Code/go"
@@ -91,6 +92,8 @@ export FZF_CTRL_T_COMMAND='fd --type f --type d --hidden --follow --exclude .git
 export FZF_CTRL_T_OPTS="--preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -500' --preview-window right:100:wrap"
 export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:hidden:wrap --bind '?:toggle-preview' --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort' --header 'Press CTRL-Y to copy command into clipboard' --border"
 
+# Kubectl
+export KUBECONFIG="$HOME/Code/bitbucket.org/pryoninc/api-deployment/keys/kubeconfig"
 # =============
 
 # Which plugins would you like to load?
@@ -128,7 +131,7 @@ export EDITOR='nvim'
 
 # ==========================================================================================
 # zsh-syntax-highlighting
-source /home/james/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # ==========================================================================================
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
@@ -143,3 +146,9 @@ export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f "$HOME/.google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/.google-cloud-sdk/path.zsh.inc"; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f "$HOME/.google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/.google-cloud-sdk/completion.zsh.inc"; fi
