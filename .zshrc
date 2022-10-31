@@ -82,10 +82,6 @@ export GO111MODULE=on
 # fzf
 : ${FZF_BASE=/usr/local/opt/fzf}
 
-# misc
-export CLICOLOR=1
-export TERM=screen-256color
-
 # FZF
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export FZF_CTRL_T_COMMAND='fd --type f --type d --hidden --follow --exclude .git'
