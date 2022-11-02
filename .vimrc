@@ -183,19 +183,21 @@ command! -nargs=* T split | terminal <args>
 command! -nargs=* VT vsplit | terminal <args>
 command! -nargs=* VTS vsplit | vertical resize 90 | terminal <args>
 
-" ----------------------------------------------------------------------------
 " Markdown headings
-" ----------------------------------------------------------------------------
 nnoremap <leader>1 m`yypVr=``
 nnoremap <leader>2 m`yypVr-``
 nnoremap <leader>3 m`^i### <esc>``4l
 nnoremap <leader>4 m`^i#### <esc>``6l
 
-" ----------------------------------------------------------------------------
 " <Leader>c Close quickfix/location window
-" ----------------------------------------------------------------------------
 nnoremap <leader>c :cclose<bar>lclose<cr>
 
+" delete without yanking
+nnoremap <leader>d "_d
+vnoremap <leader>d "_d
+
+" replace currently selected text with default register without yanking it
+vnoremap <leader>p "_dP
 
 " }}}
 " ============================================================================
@@ -217,29 +219,22 @@ nnoremap <leader>! :call <SID>goog(expand("<cWORD>"), 1)<cr>
 xnoremap <leader>? "gy:call <SID>goog(@g, 0)<cr>gv
 xnoremap <leader>! "gy:call <SID>goog(@g, 1)<cr>gv
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ----------------------------------------------------------------------------
+" ----------------------------------------------------------------------------
+" ----------------------------------------------------------------------------
 " Plugins
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ----------------------------------------------------------------------------
 
-"""""""""""""""""""""""""""""""
-" airline
-"""""""""""""""""""""""""""""""
-let g:airline_theme='gruvbox'
-let g:airline_powerline_fonts=1
-let g:airline_highlighting_cache=1
-
-let g:airline#extensions#tabline#enabled=1
-
-""""""""""""""""""""""""""""""
+" ----------------------------------------------------------------------------
 " indentLine
-""""""""""""""""""""""""""""""
+" ----------------------------------------------------------------------------
 let g:indentLine_color_term = 245
 let g:indentLine_char = '¦'
 set list lcs=tab:\|\
 
-""""""""""""""""""""""""""""""
+" ----------------------------------------------------------------------------
 " Startify
-""""""""""""""""""""""""""""""
+" ----------------------------------------------------------------------------
 let g:startify_session_dir = '~/.vim/sessions'
 
 " ----------------------------------------------------------------------------
@@ -614,15 +609,15 @@ require('nightfox').setup({
     dim_inactive = false,   -- Non focused panes set to alternative background
     styles = {              -- Style to be applied to different syntax groups
       comments = "italic",    -- Value is any valid attr-list value `:help attr-list`
-      conditionals = "italic",
-      constants = "italic",
-      functions = "italic",
+      conditionals = "NONE",
+      constants = "NONE",
+      functions = "NONE",
       keywords = "italic",
-      numbers = "italic",
-      operators = "italic",
-      strings = "italic",
-      types = "italic",
-      variables = "italic",
+      numbers = "NONE",
+      operators = "NONE",
+      strings = "NONE",
+      types = "NONE",
+      variables = "NONE",
     },
     inverse = {             -- Inverse highlight for different types
       match_paren = false,
