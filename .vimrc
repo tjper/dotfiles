@@ -5,6 +5,9 @@ Plug 'mhinz/vim-startify'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend updating the parsers on update
 Plug 'nvim-treesitter/nvim-treesitter-context'
 Plug 'neovim/nvim-lspconfig'
+Plug 'folke/todo-comments.nvim'
+Plug 'nvim-lualine/lualine.nvim'
+Plug 'nvim-tree/nvim-web-devicons'
 
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-buffer'
@@ -19,10 +22,7 @@ Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'norcalli/nvim-colorizer.lua'
-Plug 'dense-analysis/ale'
 Plug 'karb94/neoscroll.nvim'
-
-Plug 'folke/todo-comments.nvim'
 
 Plug 'EdenEast/nightfox.nvim'
 
@@ -41,15 +41,6 @@ Plug 'tpope/vim-obsession'
 Plug 'mattn/emmet-vim'
 
 call plug#end()
-
-" """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Display
-" """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:nord_cursor_line_number_background = 1
-let g:nord_bold = 1
-let g:nord_italic = 1
-let g:nord_italic_comments = 1
-let g:nord_underline = 1
 
 " """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Basic Settings
@@ -94,7 +85,7 @@ set clipboard+=unnamedplus
 set foldlevelstart=99
 set grepformat=%f:%l:%c:%m,%f:%l:%m
 set completeopt=menu,menuone,noselect
-set nocursorline
+set cursorline
 set nopaste
 set nrformats=hex
 silent! set cryptmethod=blowfish2
@@ -200,9 +191,8 @@ vnoremap <leader>d "_d
 " replace currently selected text with default register without yanking it
 vnoremap <leader>p "_dP
 
-" }}}
 " ============================================================================
-" FUNCTIONS & COMMANDS {{{
+" FUNCTIONS & COMMANDS & AUTOCMDS
 " ============================================================================
 " ----------------------------------------------------------------------------
 " <Leader>?/! | Google it / Feeling lucky
@@ -219,6 +209,9 @@ nnoremap <leader>? :call <SID>goog(expand("<cWORD>"), 0)<cr>
 nnoremap <leader>! :call <SID>goog(expand("<cWORD>"), 1)<cr>
 xnoremap <leader>? "gy:call <SID>goog(@g, 0)<cr>gv
 xnoremap <leader>! "gy:call <SID>goog(@g, 1)<cr>gv
+
+autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()
+autocmd BufWritePre *.tsx,*.ts,*.jsx,*.js EslintFixAll
 
 " ----------------------------------------------------------------------------
 " ----------------------------------------------------------------------------
@@ -509,6 +502,10 @@ nvim_lsp.bashls.setup{
 nvim_lsp.tailwindcss.setup{
   capabilities = nvim_cmp,
 }
+
+nvim_lsp.golangci_lint_ls.setup {}
+nvim_lsp.eslint.setup{}
+
 EOF
 
 
@@ -548,7 +545,7 @@ EOF
 " ----------------------------------------------------------------------------
 let g:ale_completion_enabled = 0
 let g:ale_disable_lsp = 1
-let g:ale_fix_on_save = 1
+let g:ale_fix_on_save = 0
 let g:ale_go_golangci_lint_package = 1
 
 let g:ale_fixers = {
@@ -598,6 +595,9 @@ lua << EOF
   }
 EOF
 
+" ----------------------------------------------------------------------------
+" EdenEast/nightfox.nvim
+" ----------------------------------------------------------------------------
 lua << EOF
 -- Default options
 require('nightfox').setup({
@@ -636,4 +636,11 @@ require('nightfox').setup({
 
 -- setup must be called before loading
 vim.cmd("colorscheme nightfox")
+EOF
+
+" ----------------------------------------------------------------------------
+" nvim-lualine/lualine.nvim
+" ----------------------------------------------------------------------------
+lua << EOF
+require('lualine').setup()
 EOF
