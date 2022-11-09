@@ -8,6 +8,7 @@ Plug 'neovim/nvim-lspconfig'
 Plug 'folke/todo-comments.nvim'
 Plug 'nvim-lualine/lualine.nvim'
 Plug 'nvim-tree/nvim-web-devicons'
+Plug 'folke/which-key.nvim'
 
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-buffer'
@@ -96,6 +97,8 @@ set updatetime=300
 set signcolumn=yes
 set foldmethod=indent
 set termguicolors
+set splitbelow
+set splitright
 
 
 set modelines=2
@@ -210,8 +213,31 @@ nnoremap <leader>! :call <SID>goog(expand("<cWORD>"), 1)<cr>
 xnoremap <leader>? "gy:call <SID>goog(@g, 0)<cr>gv
 xnoremap <leader>! "gy:call <SID>goog(@g, 1)<cr>gv
 
-autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()
+" Format on save. 
+autocmd BufWritePre <buffer> lua vim.lsp.buf.format{ async = true }
+" eslint has command EsLintFixAll that should be utilizes to format all files
+" covered by pattern.
 autocmd BufWritePre *.tsx,*.ts,*.jsx,*.js EslintFixAll
+
+" Pulled from https://github.com/golang/tools/blob/master/gopls/doc/vim.md#neovim-config
+" Used to apply the "source.organizeImports" code action in Go files.
+lua <<EOF
+  function go_org_imports(wait_ms)
+    local params = vim.lsp.util.make_range_params()
+    params.context = {only = {"source.organizeImports"}}
+    local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, wait_ms)
+    for cid, res in pairs(result or {}) do
+      for _, r in pairs(res.result or {}) do
+        if r.edit then
+          local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
+          vim.lsp.util.apply_workspace_edit(r.edit, enc)
+        end
+      end
+    end
+  end
+EOF
+" On file save, organize imports in Go files.
+autocmd BufWritePre *.go lua go_org_imports()
 
 " ----------------------------------------------------------------------------
 " ----------------------------------------------------------------------------
@@ -475,7 +501,7 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
   buf_set_keymap('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
   buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-  buf_set_keymap("n", "<leader>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+  buf_set_keymap("n", "<leader>f", "<cmd>lua vim.lsp.buf.format{ async = true }<CR>", opts)
 end
 
 local nvim_lsp = require('lspconfig')
@@ -539,31 +565,6 @@ EOF
 lua << EOF
 require'colorizer'.setup()
 EOF
-
-" ----------------------------------------------------------------------------
-" ale
-" ----------------------------------------------------------------------------
-let g:ale_completion_enabled = 0
-let g:ale_disable_lsp = 1
-let g:ale_fix_on_save = 0
-let g:ale_go_golangci_lint_package = 1
-
-let g:ale_fixers = {
-\   '*': ['remove_trailing_lines', 'trim_whitespace'],
-\   'javascript': ['eslint', 'prettier'],
-\   'javascript.jsx': ['eslint', 'prettier'],
-\   'typescript': ['eslint', 'prettier'],
-\   'typescriptreact': ['eslint', 'prettier'],
-\   'go': ['gofmt', 'goimports'],
-\}
-
-let g:ale_linters = {
-\   'javascript': ['eslint', 'prettier'],
-\   'javascript.jsx': ['eslint', 'prettier'],
-\   'typescript': ['eslint', 'prettier'],
-\   'typescriptreact': ['eslint', 'prettier'],
-\   'go': ['golangci-lint'],
-\}
 
 " ----------------------------------------------------------------------------
 " neoscroll
@@ -643,4 +644,11 @@ EOF
 " ----------------------------------------------------------------------------
 lua << EOF
 require('lualine').setup()
+EOF
+
+" ----------------------------------------------------------------------------
+" folke/which-key.nvim
+" ----------------------------------------------------------------------------
+lua << EOF
+require('which-key').setup{}
 EOF

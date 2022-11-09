@@ -77,6 +77,7 @@ export GOBIN="$GOPATH/bin"
 export GOCACHE=""
 export PATH="$GOBIN:$PATH"
 export PATH="/usr/local/bin:$PATH"
+export PATH="/usr/local/go/bin:$PATH"
 export GO111MODULE=on
 
 # fzf
