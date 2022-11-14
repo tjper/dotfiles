@@ -215,9 +215,6 @@ xnoremap <leader>! "gy:call <SID>goog(@g, 1)<cr>gv
 
 " Format on save. 
 autocmd BufWritePre <buffer> lua vim.lsp.buf.format{ async = true }
-" eslint has command EsLintFixAll that should be utilizes to format all files
-" covered by pattern.
-autocmd BufWritePre *.tsx,*.ts,*.jsx,*.js EslintFixAll
 
 " Pulled from https://github.com/golang/tools/blob/master/gopls/doc/vim.md#neovim-config
 " Used to apply the "source.organizeImports" code action in Go files.
