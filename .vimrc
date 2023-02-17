@@ -27,6 +27,7 @@ Plug 'fhill2/telescope-ultisnips.nvim'
 Plug 'norcalli/nvim-colorizer.lua'
 Plug 'karb94/neoscroll.nvim'
 Plug 'RRethy/vim-illuminate'
+Plug 'lukas-reineke/indent-blankline.nvim'
 
 Plug 'EdenEast/nightfox.nvim'
 
@@ -760,4 +761,17 @@ require('illuminate').configure({
     -- min_count_to_highlight: minimum number of matches required to perform highlighting
     min_count_to_highlight = 1,
 })
+EOF
+
+
+" ----------------------------------------------------------------------------
+" lukas-reineke/indent-blankline.nvim
+" ----------------------------------------------------------------------------
+lua << EOF
+vim.opt.list = true
+vim.opt.listchars:append "eol:↴"
+
+require("indent_blankline").setup {
+    show_end_of_line = true,
+}
 EOF
