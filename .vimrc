@@ -10,6 +10,7 @@ Plug 'nvim-lualine/lualine.nvim'
 Plug 'nvim-tree/nvim-web-devicons'
 Plug 'folke/which-key.nvim'
 Plug 'lewis6991/gitsigns.nvim'
+Plug 'github/copilot.vim'
 
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-buffer'
